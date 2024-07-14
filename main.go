@@ -7,67 +7,77 @@ import (
 	"image"
 	_ "image/jpeg"
 	_ "image/png"
+	"math"
 	"os"
 )
 
-var w, h int
-
-func getTermSize() {
+func getTermSize() (int, int) {
 	W, H, err := term.GetSize(int(os.Stdout.Fd()))
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "fatal: could not get terminal size")
 		os.Exit(1)
 	}
-	w, h = W, H
+	return W, H
 }
 
-func getSize(x, y int) (uint, uint) {
-	if y > h {
-		x = x * h / y
-		y = h
-	}
+func (img *Immg) FitSize(W, H int) {
+	y := float64(img.Img.Bounds().Dy())
+	x := float64(img.Img.Bounds().Dx())
+	w := float64(W)
+	h := float64(H)*2 - 1
 	if x > w {
 		y = y * w / x
 		x = w
 	}
-	return uint(x), uint(y) / 2
+	if y > h {
+		x = x * h / y
+		y = h
+	}
+	img.Img = resize.Resize(uint(math.Round(x)), uint(math.Round(y)), img.Img, resize.MitchellNetravali)
 }
 
-func getImg(path string) (image.Image, error) {
-	var img image.Image
+func (img *Immg) OpenImg(path string) error {
 	file, err := os.Open(path)
 	if err != nil {
-		return img, fmt.Errorf("error opening file: %s", path)
+		return fmt.Errorf("error opening file: %s", path)
 	}
 	defer file.Close()
-	img, _, err = image.Decode(file)
+	img.Img, _, err = image.Decode(file)
 	if err != nil {
-		return img, fmt.Errorf("error decoding file: %s", path)
+		return fmt.Errorf("error decoding file: %s", path)
 	}
-	return img, nil
+	return nil
 }
 
-func printImg(path string) error {
+type Immg struct {
+	Img image.Image
+	X   int
+	Y   int
+}
 
-	img, err := getImg(path)
-	if err != nil {
-		return err
+func (img *Immg) ForX() {
+	img.X = 0
+	for img.X < 2*(img.Img.Bounds().Dx()) {
+		img.Doalp()
+		img.X++
+		img.Doalp()
+		img.X++
+		fmt.Print("▀\033[0m")
 	}
+}
 
-	W, H := getSize(img.Bounds().Dx(), img.Bounds().Dy())
-
-	img = resize.Resize(W, H, img, resize.MitchellNetravali)
-
-	bounds := img.Bounds()
-	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
-		for x := bounds.Min.X; x < bounds.Max.X; x++ {
-			r, g, b, _ := img.At(x, y).RGBA()
-			fmt.Printf("\033[48;2;%d;%d;%dm \033[0m", r>>8, g>>8, b>>8)
-		}
+func (img *Immg) Print() {
+	img.Y = img.Img.Bounds().Min.Y
+	for img.Y < img.Img.Bounds().Max.Y {
+		img.ForX()
 		fmt.Println()
+		img.Y += 2
 	}
-	fmt.Println()
-	return nil
+}
+
+func (img *Immg) Doalp() {
+	r, g, b, _ := img.Img.At(img.Img.Bounds().Min.X+img.X/2, img.Y+img.X%2).RGBA()
+	fmt.Printf("\033[%d8;2;%d;%d;%dm", 3+(img.X%2), r>>8, g>>8, b>>8)
 }
 
 func main() {
@@ -75,18 +85,16 @@ func main() {
 		fmt.Fprintln(os.Stderr, "fatal: no image specified")
 		os.Exit(1)
 	}
-	getTermSize()
-	var errs []error
+	W, H := getTermSize()
+	var img Immg
+	var err error
 	for _, path := range os.Args[1:] {
-		err := printImg(path)
+		err = img.OpenImg(path)
 		if err != nil {
-			errs = append(errs, err)
+			fmt.Fprintf(os.Stderr, "error opening image: %s\n", path)
+			continue
 		}
-	}
-	if len(errs) > 0 {
-		for _, err := range errs {
-			fmt.Fprintln(os.Stderr, err)
-		}
-		os.Exit(1)
+		img.FitSize(W, H)
+		img.Print()
 	}
 }
