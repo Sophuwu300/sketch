@@ -9,11 +9,12 @@ import (
 	_ "image/png"
 	"math"
 	"os"
+	"strings"
 )
 
 func getTermSize() (int, int) {
 	W, H, err := term.GetSize(int(os.Stdout.Fd()))
-	if err != nil {
+	if err != nil || !(W > 0 && H > 0) {
 		fmt.Fprintln(os.Stderr, "fatal: could not get terminal size")
 		os.Exit(1)
 	}
@@ -89,6 +90,13 @@ func main() {
 	var img Immg
 	var err error
 	for _, path := range os.Args[1:] {
+		if strings.HasPrefix(path, "-") && len(path) == 2 && '1' <= path[1] && path[1] <= '9' {
+			W *= (int(path[1]) - '0')
+			W /= 10
+			H *= (int(path[1]) - '0')
+			H /= 10
+			continue
+		}
 		err = img.OpenImg(path)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "error opening image: %s\n", path)
