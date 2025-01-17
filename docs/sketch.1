@@ -1,0 +1,49 @@
+.TH SKETCH 1 "October 2023" "Version 1.1.0" "User Commands"
+.SH NAME
+sketch \- Terminal image viewer
+
+.SH SYNOPSIS
+.B sketch
+[\fIoptions\fR] \fIimage_files\fR...
+
+.SH DESCRIPTION
+.B sketch
+is a terminal image viewer that scales images to fit in the terminal while maintaining the aspect ratio.
+
+.SH OPTIONS
+.TP
+.B \-h, \-\-help
+Show help message and exit.
+
+.TP
+.B \-v, \-\-version
+Show version information and exit.
+
+.TP
+.B \-n, [0\<n\<10]
+Adjust the scaling of the image. Where n is between 1 and 9, for 10% and 90% scaling, respectively. Default is 100%.
+
+.SH EXAMPLES
+.TP
+View an image in the terminal:
+.B sketch
+image.png
+
+.TP
+View multiple images in the terminal:
+.B sketch
+image1.png image2.jpg
+
+.TP
+Adjust the scaling of the image:
+.B sketch \-s 5
+image.png
+
+.SH AUTHOR
+Sophie Kisiel <sophie@skisiel.com>
+
+.SH LICENSE
+MIT License
+
+.SH SEE ALSO
+.BR img (1)
