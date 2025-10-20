@@ -1,4 +1,4 @@
-module sketch
+module git.sophuwu.com/sketch
 
 go 1.21.3
 
