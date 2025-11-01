@@ -102,10 +102,40 @@ func (img *Immg) Doalp() {
 
 var scaleFlag = regexp.MustCompile(`-[0-9]+`)
 
+func init() {
+	for _, arg := range os.Args[1:] {
+		if arg == "-h" || arg == "--help" {
+			fmt.Println("Usage: imgcat [options] [image files]")
+			fmt.Println("Options:")
+			fmt.Println("  -h, --help       Show this help message")
+			fmt.Println("  -sN              Set scale to N/10 (e.g., -s8 sets scale to 0.8)")
+			fmt.Println()
+			fmt.Println("To use interactive gallery mode, run without any arguments.\nOr with a directory as the only argument.")
+			os.Exit(0)
+		}
+		if arg == "--version" {
+			fmt.Printf("sketch: %s\nversion: %s\n", os.Args[0], SKETCH_VERSION)
+			os.Exit(0)
+		}
+	}
+}
+
 func main() {
 	if len(os.Args) == 1 {
 		gallery()
 		return
+	}
+	if len(os.Args) == 2 {
+		st, err := os.Stat(os.Args[1])
+		if err == nil && st.IsDir() {
+			err = os.Chdir(os.Args[1])
+			if err != nil {
+				fmt.Fprintln(os.Stderr, "fatal: could not change directory")
+				os.Exit(1)
+			}
+			gallery()
+			return
+		}
 	}
 	var img Immg
 	img.Scale = 1

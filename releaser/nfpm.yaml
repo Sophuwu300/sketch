@@ -1,0 +1,31 @@
+name: "sketch"
+arch: "{{ Target }}"
+platform: "linux"
+version: "{{ Version }}"
+section: "default"
+priority: "extra"
+replaces:
+provides:
+depends:
+recommends:
+suggests:
+conflicts:
+maintainer: "sophuwu <sophie@sophuwu.com>"
+description: |
+   Terminal image viewer. Scales the image to fit in the terminal; maintaining aspect ratio.
+   Features:
+    - View images in your terminal
+    - Show as many images as you want at once
+    - Images always scale to fit the terminal size
+    - Supports png and jpg
+    - Adjustable scaling with flags
+vendor: "sophuwu.com"
+homepage: "https://git.sophuwu.com/sketch"
+license: "MIT"
+changelog: ""
+contents:
+- src: ./sketch
+  dst: /usr/bin/sketch
+- src: ../sketch.1
+  dst: /usr/share/man/man1/sketch.1
+overrides:

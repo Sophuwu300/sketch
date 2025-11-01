@@ -1,0 +1,69 @@
+.TH SKETCH 1 "October 2023" "Version {{ Version }}" "User Commands"
+.SH NAME
+sketch \- Terminal image viewer
+
+.SH SYNOPSIS
+.B sketch
+[\fIoptions\fR] \fIimage_files\fR...
+
+.SH DESCRIPTION
+.B sketch
+is a terminal image viewer that scales images to fit in the terminal while
+maintaining the aspect ratio. The program has an interactive mode and
+a command line mode.
+.sp
+To use interactive mode in the current directory, run the command without any
+arguments. If you want to view images in a different directory, you can pass
+the directory path as an argument.
+.sp
+.B sketch
+.sp
+.B sketch /path/to/directory
+.sp
+In interactive mode, sketch will display images in the terminal one at a time.
+You can navigate through the images using the keybinding shown in the
+interface. Press 'q' to exit the program.
+.sp
+.B Command line mode
+.sp
+To use command line mode, run the command with the paths to images as arguments.
+.sp
+.B sketch image1.png image2.jpg ~/Pictures/*.png
+.sp
+In command line mode, sketch will print each image to the screen one after
+another. After displaying all images, the program will exit.
+
+.SH OPTIONS
+.TP
+.B \-h, \-\-help
+Show help message and exit.
+
+.TP
+.B \-n, [0\<n\<10]
+Adjust the scaling of the image. Where n is between 1 and 9, for 10% and 90% scaling,
+respectively. Default is 100%.
+
+.SH EXAMPLES
+.TP
+View an image in the terminal:
+.B sketch
+image.png
+
+.TP
+View multiple images in the terminal:
+.B sketch
+image1.png image2.jpg
+
+.TP
+Adjust the scaling of the image:
+.B sketch \-s 5
+image.png
+
+.SH AUTHOR
+Sophie Kisiel <sophie@skisiel.com>
+
+.SH LICENSE
+MIT License
+
+.SH SEE ALSO
+.BR img (1)
