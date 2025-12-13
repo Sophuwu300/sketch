@@ -2,9 +2,12 @@ package main
 
 import (
 	"fmt"
+	_ "github.com/mat/besticon/ico"
 	"image"
+	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png"
+
 	"math"
 	"os"
 	"os/signal"
@@ -100,7 +103,7 @@ func (img *Immg) Doalp() {
 	fmt.Printf("\033[%d8;2;%d;%d;%dm", 3+(img.X%2), r>>8, g>>8, b>>8)
 }
 
-var scaleFlag = regexp.MustCompile(`-[0-9]+`)
+var scaleFlag = regexp.MustCompile(`^-[0-9]+$`)
 
 func init() {
 	for _, arg := range os.Args[1:] {
@@ -253,9 +256,13 @@ func (g *Gallary) Load() error {
 		return fmt.Errorf("fatal: could not read current directory")
 	}
 	paths := []string{}
-	rx := regexp.MustCompile(`(?i)\.(png|jpe?g)$`).MatchString
+	rx := regexp.MustCompile(`(?i)\.(png|jpe?g|gif|webp|ico)$`).MatchString
 	for _, entry := range de {
 		if entry.IsDir() {
+			continue
+		}
+		err = g.Img.OpenImg(entry.Name())
+		if err != nil {
 			continue
 		}
 		if entry.Type().IsRegular() && rx(entry.Name()) {
